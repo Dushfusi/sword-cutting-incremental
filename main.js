@@ -1,6 +1,6 @@
 let intervalDuration = 1000;  // milliseconds (1 second)
 let gameInterval = null;
-var energy = 1600;
+var energy = 0;
 var canClick = true;
 var swords = 0;
 var manualClicksThisSecond = 0;
@@ -240,3 +240,5 @@ updateAttackSpeedDisplay();
 openTab('mainTab');
 // Initialize visuals on page load
 updateSkillVisuals();
+updateEnergyText();
+updateEnergyPerSecond();
