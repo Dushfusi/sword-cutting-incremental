@@ -3,11 +3,69 @@
 <head>
     <link rel="stylesheet" type="text/css" href="interface.css" />
     <title>Sword Cutting Incremental</title>
+    <style>
+        /* Skill Tree Styles */
+        .skill-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 60px;
+        }
+
+        .skill {
+            min-width: 150px;
+            height: 40px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 40px;
+            background-color: #222;
+            color: #ccc;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: not-allowed;
+            user-select: none;
+        }
+
+        .skill.unlocked {
+            background-color: #4CAF50;
+            border-color: #0a0;
+            color: white;
+            cursor: default;
+        }
+
+        .skill.unlockable {
+            background-color: #555;
+            border-color: #aa0;
+            color: #ff0;
+            cursor: pointer;
+        }
+
+        .connector.vertical {
+            width: 2px;
+            height: 30px;
+            background-color: #888;
+            margin: 0 auto;
+        }
+
+
+        @media (max-width: 480px) {
+            .skill-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .connector.vertical {
+                height: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="tabs">
         <button onclick="openTab('mainTab')">Main</button>
-		<button onclick="openTab('skillsTab')">Skills</button>
+        <button onclick="openTab('skillsTab')">Skills</button>
         <button onclick="openTab('upgradesTab')">Upgrades</button>
         <button onclick="openTab('statsTab')">Stats</button>
     </div>
@@ -16,50 +74,99 @@
         <!-- Main Tab -->
         <div id="mainTab" class="tab-content">
             <h1>Sword Cutting Incremental</h1>
-            <div class="stat-line">Energy: <span id="energy">0</span></div>
-            <div class="stat-line">Energy per second: <span id="energyPerSecond">0</span></div>
-			<div id="expContainer">
-				<div id="expBar">
-					<div id="expBarFill"></div>
-					<span id="expText">Level 1: 0 / 10</span>
-				</div>
+            <div id="swordContainer">
+                <img id="swordImage" src="assets/sword.webp" alt="Sword" />
+            </div>
+
+            <div class="stat-group">
+				<div class="stat-line">Energy: <span id="energy">0</span></div>
+				<div class="stat-line">Energy per second: <span id="energyPerSecond">0</span></div>
 			</div>
 
+            <div id="expContainer">
+                <div id="expBar">
+                    <div id="expBarFill"></div>
+                    <span id="expText">Level 1: 0 / 10</span>
+                </div>
+            </div>
 
             <button onclick="manualClick(1)">Cut!</button>
         </div>
-		<!-- Skills Tab -->
-		<div id="skillsTab" class="tab-content" style="display: none;">
-			<h2>Skill Tree</h2>
-			<div id="skillTree">
-				<div id="skill1" class="skill locked" onclick="unlockSkill('skill1')">Sword Creation</div>
-				<div id="skill2" class="skill locked" onclick="unlockSkill('skill2')">Sharpness</div>
-				<div id="skill3" class="skill locked" onclick="unlockSkill('skill3')">Piercer</div>
-				<div id="skill4" class="skill locked" onclick="unlockSkill('skill4')">Double Slash</div>
-			</div>
-		</div>
 
+       <!-- Skills Tab -->
+        <div id="skillsTab" class="tab-content" style="display: none;">
+            <h2>Skill Tree</h2>
+            <div class="stat-line">Skill Points: <span id="skillPoints">0</span></div>
+            <div id="skillTree">
+				<!-- Level 1 -->
+				<div class="skill" style="grid-column: 3; grid-row: 1;" id="skill1" onclick="unlockSkill('skill1')">
+					Sword Creation
+					<div class="skill-cost">Cost: 1 SP</div>
+				</div>
+
+				<!-- Connector -->
+				<div class="connector vertical" style="grid-column: 3; grid-row: 2;"></div>
+
+				<!-- Level 2 -->
+				<div class="skill" style="grid-column: 3; grid-row: 3;" id="skill2" onclick="unlockSkill('skill2')">
+					Sharpness
+					<div class="skill-cost">Cost: 3 SP</div>
+				</div>
+
+				<!-- Connectors to Level 3 -->
+				<div class="connector vertical" style="grid-column: 2; grid-row: 4;"></div>
+				<div class="connector vertical" style="grid-column: 3; grid-row: 4;"></div>
+				<div class="connector vertical" style="grid-column: 4; grid-row: 4;"></div>
+
+				<!-- Horizontal bar from skill2 -->
+				<div class="connector horizontal" style="grid-column: 2 / 5; grid-row: 4;"></div>
+
+				<!-- Level 3 -->
+				<div class="skill" style="grid-column: 2; grid-row: 5;" id="momentum" onclick="unlockSkill('momentum')">
+					Momentum
+					<div class="skill-cost">Cost: 5 SP</div>
+				</div>
+				<div class="skill" style="grid-column: 3; grid-row: 5;" id="piercer" onclick="unlockSkill('piercer')">
+					Piercer
+					<div class="skill-cost">Cost: 5 SP</div>
+				</div>
+				<div class="skill" style="grid-column: 4; grid-row: 5;" id="flurry" onclick="unlockSkill('flurry')">
+					Flurry Slash
+					<div class="skill-cost">Cost: 5 SP</div>
+				</div>
+			</div>
+
+        </div>
 
         <!-- Upgrades Tab -->
         <div id="upgradesTab" class="tab-content" style="display:none;">
             <h2>Upgrades</h2>
-            <div class="stat-line">Swords: <span id="swords">0</span></div>
-            <div class="stat-line">
+			<div class="stat-group">
+				<div class="stat-line">Energy: <span id="energy">0</span></div>
+				<div class="stat-line">Energy per second: <span id="energyPerSecond">0</span></div>
+			</div>
+
+            <div id="buySwordContainer" class="stat-line" style="display:none;">
+                Swords: <span id="swords">0</span>
+                <br />
                 Sword Cost: <span id="swordCost">10</span>
                 <button onclick="buySword()">Buy Sword</button>
             </div>
-			<div class = "stat-line">Sharpness <span id="sharpness">1</span> </div>
-			<div class="stat-line">
-                
-               Sharpness Cost: <span id="sharpenCost">1,500</span>
+
+            <div id="buySharpnessContainer" class="stat-line" style="display:none;">
+                Sharpness <span id="sharpness">1</span>
+                <br />
+                Sharpness Cost: <span id="sharpenCost">1,500</span>
                 <button onclick="sharpen()">Sharpen your Swords</button>
             </div>
-			<div class = "stat-line">Flurry Slash <span id="flurryChance">0</span>% </div>
-			<div class="stat-line">
-                
-               Flurry Chance Cost: <span id="flurryCost">2,500</span>
+
+            <div id="buyFlurryContainer" class="stat-line" style="display:none;">
+                Flurry Slash <span id="flurryChance">0</span>%
+                <br />
+                Flurry Chance Cost: <span id="flurryCost">2,500</span>
                 <button onclick="buyFlurry()">Strike with 5 cuts at once!</button>
             </div>
+
             <div class="stat-line">
                 Attack Speed: <span id="attackSpeed">1.00</span> sec
                 <br />
@@ -72,9 +179,22 @@
         <div id="statsTab" class="tab-content" style="display:none;">
             <h2>Stats</h2>
             <p>Speed Upgrades: <span id="speedUpgradeCount">0</span></p>
-			 <button onclick="reset()">Reset Game Progress!!!</button>
+            <button onclick="reset()">Reset Game Progress!!!</button>
         </div>
     </div>
+
+    <script>
+        function updateUpgradeButtonsVisibility() {
+            document.getElementById('buySwordContainer').style.display = unlockedSkills['skill1'] ? 'block' : 'none';
+            document.getElementById('buySharpnessContainer').style.display = unlockedSkills['skill2'] ? 'block' : 'none';
+            document.getElementById('buyFlurryContainer').style.display = unlockedSkills['flurry'] ? 'block' : 'none';
+        }
+
+        // Call it once on page load (adjust if you initialize unlockedSkills after load)
+        document.addEventListener("DOMContentLoaded", function () {
+            updateUpgradeButtonsVisibility();
+        });
+    </script>
 
     <script type="text/javascript" src="main.js"></script>
 </body>
