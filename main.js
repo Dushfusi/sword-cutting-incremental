@@ -6,11 +6,13 @@ var swords = 0;
 var manualClicksThisSecond = 0;
 var speedUpgrades = 0;
 var sharpnessUpgrade = 1; // Multiplier for energy gain
+var flurryUpgrades = 0;
 let exp = 0;
 let level = 1;
 let expToNextLevel = 10; // Starting threshold
 const unlockedSkills = {}; // all unlocked skills
-
+var flurryHitchance = 0; // 0% chance
+var bonusHits = 4;
 //List of all skill requirements
 const skillDependencies = {
   skill1: [],               // no prereqs
@@ -18,6 +20,11 @@ const skillDependencies = {
   skill3: ['skill1'],       // branches from skill1
   skill4: ['skill2', 'skill3']  // requires both skill2 and skill3
 };
+
+function prettify(input){
+    var output = Math.round(input * 1000000)/1000000;
+	return output;
+}
 
 //Makes a skill unlockable
 function canUnlock(skillId) {
@@ -93,6 +100,7 @@ function startGameInterval() {
     gameInterval = setInterval(function () {
         cutClick(swords);
         updateEnergyPerSecond();
+		flurrySlash();
     }, intervalDuration);
 }
 
@@ -117,16 +125,33 @@ function animateEnergyPop() {
 }
 
 
+
+// Random chance for a burst of extra cutClick actions
+function flurrySlash() {
+  
+
+   if (swords > 0 && Math.random() < flurryHitchance) {
+        for (let i = 0; i < bonusHits; i++) {
+            cutClick(swords);
+			animateEnergyPop(); // only here and skills
+			
+        }
+
+        // Optional: Visual or console feedback
+        console.log("Flurry Slash triggered!");
+    }
+}
+
 // Update Attack Speed display
 function updateAttackSpeedDisplay() {
     let seconds = (intervalDuration / 1000).toFixed(2);
-    document.getElementById("attackSpeed").innerHTML = formatNumber(seconds);
+    document.getElementById("attackSpeed").innerHTML = seconds;
 }
 
 // Increase game speed
 function speedUpGame() {
     var speedCost = Math.floor(1000000 * Math.pow(1.3, speedUpgrades));
-    if (energy >= speedCost) {
+    if (energy >= speedCost && speedUpgrades < 6) {
         intervalDuration = Math.max(100, intervalDuration - 200);
         startGameInterval();
         updateAttackSpeedDisplay();
@@ -134,7 +159,7 @@ function speedUpGame() {
         energy -= speedCost;
         updateEnergyText();
         animateEnergyPop(); // animation only on user action
-		document.getElementById('speedUpgradeCount').innerText = formatNumber(speedUpgrades);
+		document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
 
     }
     var nextCost = Math.floor(1000000 * Math.pow(1.1, speedUpgrades));
@@ -160,7 +185,7 @@ function manualClick(number) {
 
         manualClicksThisSecond += number;
         updateEnergyText();
-        animateEnergyPop(); // only here
+        animateEnergyPop(); // only here and skills
         canClick = false;
         setTimeout(() => {
             canClick = true;
@@ -190,6 +215,19 @@ function buySword() {
     }
     var nextCost = Math.floor(10 * Math.pow(1.1, swords));
     document.getElementById('swordCost').innerHTML = formatNumber(nextCost);
+}
+//Buy Flurry Chance
+function buyFlurry() {
+    var flurryCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
+    if (energy >= flurryCost) {
+        flurryHitchance = flurryHitchance + 0.1;
+		flurryUpgrades++;
+        energy -= flurryCost;
+        document.getElementById('flurryChance').innerHTML = prettify(flurryHitchance) * 100;
+   
+    }
+    var nextCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
+    document.getElementById('flurryCost').innerHTML = formatNumber(nextCost);
 }
 
 //Buy sharpness
@@ -229,11 +267,75 @@ function openTab(tabId) {
 }
 
 
+// IMPORTANT SAVING 
+function saveGame() {
+    const gameState = {
+        energy,
+        swords,
+        speedUpgrades,
+        sharpnessUpgrade,
+        flurryUpgrades,
+        exp,
+        level,
+        expToNextLevel,
+        unlockedSkills,
+        flurryHitchance,
+        bonusHits,
+        intervalDuration
+    };
 
+    localStorage.setItem('idleSwordGameSave', JSON.stringify(gameState));
+    console.log("Game saved!");
+}
+function loadGame() {
+    const savedGame = JSON.parse(localStorage.getItem('idleSwordGameSave'));
+
+    if (savedGame) {
+        energy = savedGame.energy ?? energy;
+        swords = savedGame.swords ?? swords;
+        speedUpgrades = savedGame.speedUpgrades ?? speedUpgrades;
+        sharpnessUpgrade = savedGame.sharpnessUpgrade ?? sharpnessUpgrade;
+        flurryUpgrades = savedGame.flurryUpgrades ?? flurryUpgrades;
+        exp = savedGame.exp ?? exp;
+        level = savedGame.level ?? level;
+        expToNextLevel = savedGame.expToNextLevel ?? expToNextLevel;
+        Object.assign(unlockedSkills, savedGame.unlockedSkills ?? {});
+        flurryHitchance = savedGame.flurryHitchance ?? flurryHitchance;
+        bonusHits = savedGame.bonusHits ?? bonusHits;
+        intervalDuration = savedGame.intervalDuration ?? intervalDuration;
+
+        // Refresh game state after loading
+        updateSkillVisuals();
+        updateEnergyText();
+        updateEnergyPerSecond();
+        updateExpBar();
+        document.getElementById('swords').innerHTML = formatNumber(swords);
+        document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
+        document.getElementById('flurryChance').innerHTML = prettify(flurryHitchance) * 100;
+        document.getElementById('sharpness').innerHTML = formatNumber(sharpnessUpgrade);
+        document.getElementById('swordCost').innerHTML = formatNumber(Math.floor(10 * Math.pow(1.1, swords)));
+        document.getElementById('speedCost').innerHTML = formatNumber(Math.floor(1000000 * Math.pow(1.1, speedUpgrades)));
+        document.getElementById('flurryCost').innerHTML = formatNumber(Math.floor(2500 * Math.pow(1.25, flurryUpgrades)));
+        document.getElementById('sharpenCost').innerHTML = formatNumber(Math.floor(1500 * Math.pow(1.25, sharpnessUpgrade-1)));
+
+        startGameInterval();
+        updateAttackSpeedDisplay();
+
+        console.log("Game loaded!");
+    }
+}
+function reset() {
+    if (confirm("Are you sure you want to reset your game?")) {
+        localStorage.removeItem('idleSwordGameSave');
+        location.reload();
+    }
+}
 
 
 
 // Initialize game
+setInterval(saveGame, 30000); // Save every 30 seconds
+loadGame();//Load Game
 startGameInterval();
 updateAttackSpeedDisplay();
 // Open main tab on page load
