@@ -41,7 +41,6 @@ h1, h3 {
   color: #ffffff;
 }
 
-
 @keyframes pop {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.3); }
@@ -55,6 +54,7 @@ h1, h3 {
 .pop {
   animation: pop 0.3s ease;
 }
+
 .stat-line {
   margin: 10px 0;
   font-size: 18px;
@@ -91,37 +91,41 @@ h1, h3 {
   border-radius: 10px;
   margin-top: 10px;
 }
+
 #skillsTab {
   position: relative;
   overflow: hidden;
 }
 
-/* Skill tree container */
 #skillTree {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 60px;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   position: relative;
-  width: 300px;
-  margin: 20px auto;
-  height: 200px;
 }
 
 /* Skill box style */
 .skill {
-  position: absolute;
-  width: 80px;
+  width: 100%;
+  max-width: 150px;
   height: 40px;
   border: 2px solid #555;
   border-radius: 8px;
   text-align: center;
   line-height: 40px;
-  cursor: not-allowed;
   background-color: #222;
   color: #ccc;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: not-allowed;
   user-select: none;
-  font-size: 11px;
-  
+  justify-self: center;
 }
 
-/* State colors */
 .skill.unlocked {
   background-color: #4CAF50;
   border-color: #0a0;
@@ -136,65 +140,30 @@ h1, h3 {
   cursor: pointer;
 }
 
-/* Positions */
-#skill1 { top: 20px; left: 110px; }
-#skill2 { top: 80px; left: 20px; }
-#skill3 { top: 80px; left: 200px; }
-#skill4 { top: 140px; left: 110px; }
-
-/* Branch lines — only style when inside #skillsTab */
-#skillsTab #skill1::after {
-  content: '';
-  position: absolute;
+/* Connectors */
+.connector {
   width: 2px;
-  height: 40px;
-  background: #888;
-  top: 40px;
-  left: 50%;
+  height: 100%;
+  background-color: #888;
+  justify-self: center;
 }
 
-#skillsTab #skill2::before {
-  content: '';
-  position: absolute;
-  width: 90px;
+.connector.horizontal {
+  width: 100%;
   height: 2px;
-  background: #888;
-  top: -20px;
-  left: 80px;
+  background-color: #888;
+  align-self: center;
 }
 
-#skillsTab #skill3::before {
-  content: '';
-  position: absolute;
-  width: 90px;
-  height: 2px;
-  background: #888;
-  top: -20px;
-  left: -90px;
+/* Responsive grid */
+@media (max-width: 480px) {
+  #skillTree {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
 }
 
-#skillsTab #skill2::after,
-#skillsTab #skill3::after {
-  content: '';
-  position: absolute;
-  width: 2px;
-  height: 40px;
-  background: #888;
-  top: 40px;
-  left: 50%;
-}
-
-#skillsTab #skill4::before {
-  content: '';
-  position: absolute;
-  width: 180px;
-  height: 2px;
-  background: #888;
-  top: -20px;
-  left: -90px;
-}
-
-
+/* EXP Bar */
 #expContainer {
   margin: 10px auto;
   width: 80%;
@@ -235,5 +204,61 @@ h1, h3 {
   font-weight: bold;
   font-size: 14px;
   pointer-events: none;
+}
+
+/* Sword Image */
+#swordContainer {
+  width: 100px;
+  margin: 0 auto;
+}
+
+#swordImage {
+  width: 100%;
+  transform-origin: bottom center;
+}
+
+.swing {
+  animation: swingAnim 0.3s ease-out;
+}
+
+@keyframes swingAnim {
+  0%   { transform: rotate(0deg); }
+  30%  { transform: rotate(-30deg); }
+  60%  { transform: rotate(20deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Sword glow based on momentum stacks */
+#swordImage.base {
+    filter: none;
+    border: 2px solid transparent;
+}
+
+#swordImage.low-momentum {
+    filter: drop-shadow(0 0 4px #00ff99);
+    border: 2px solid #00ff99;
+}
+
+#swordImage.medium-momentum {
+    filter: drop-shadow(0 0 6px #33ccff);
+    border: 2px solid #33ccff;
+}
+
+#swordImage.high-momentum {
+    filter: drop-shadow(0 0 10px #ffcc00);
+    border: 2px solid #ffcc00;
+}
+
+#swordImage.overheat {
+    filter: drop-shadow(0 0 12px red);
+    border: 2px solid red;
+}
+
+.stat-group {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
