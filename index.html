@@ -54,6 +54,12 @@
                Sharpness Cost: <span id="sharpenCost">1,500</span>
                 <button onclick="sharpen()">Sharpen your Swords</button>
             </div>
+			<div class = "stat-line">Flurry Slash <span id="flurryChance">0</span>% </div>
+			<div class="stat-line">
+                
+               Flurry Chance Cost: <span id="flurryCost">2,500</span>
+                <button onclick="buyFlurry()">Strike with 5 cuts at once!</button>
+            </div>
             <div class="stat-line">
                 Attack Speed: <span id="attackSpeed">1.00</span> sec
                 <br />
@@ -66,6 +72,7 @@
         <div id="statsTab" class="tab-content" style="display:none;">
             <h2>Stats</h2>
             <p>Speed Upgrades: <span id="speedUpgradeCount">0</span></p>
+			 <button onclick="reset()">Reset Game Progress!!!</button>
         </div>
     </div>
 
