@@ -262,3 +262,59 @@ h1, h3 {
     flex-wrap: wrap;
 }
 
+ /* Skill Tree Styles */
+        .skill-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 60px;
+        }
+
+        .skill {
+            min-width: 150px;
+            height: 40px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 40px;
+            background-color: #222;
+            color: #ccc;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: not-allowed;
+            user-select: none;
+        }
+
+        .skill.unlocked {
+            background-color: #4CAF50;
+            border-color: #0a0;
+            color: white;
+            cursor: default;
+        }
+
+        .skill.unlockable {
+            background-color: #555;
+            border-color: #aa0;
+            color: #ff0;
+            cursor: pointer;
+        }
+
+        .connector.vertical {
+            width: 2px;
+            height: 30px;
+            background-color: #888;
+            margin: 0 auto;
+        }
+
+
+        @media (max-width: 480px) {
+            .skill-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .connector.vertical {
+                height: 20px;
+            }
+        }
