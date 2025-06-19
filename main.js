@@ -1,6 +1,6 @@
 let intervalDuration = 1000;  // milliseconds (1 second)
 let gameInterval = null;
-var energy = 0;
+var energy = 1500000;
 var canClick = true;
 var swords = 0;
 var manualClicksThisSecond = 0;
@@ -208,10 +208,10 @@ function gainMomentum() {
 function resetMomentum() {
     momentumStacks = 0;
     isOverheating = false;
-    intervalDuration = baseInterval;
+    intervalDuration = getBaseSpeedFromUpgrades();
     startGameInterval();
     updateAttackSpeedDisplay();
-	updateSwordVisual();
+    updateSwordVisual();
     console.log("Momentum reset after overheat.");
 }
 
@@ -227,7 +227,7 @@ function triggerOverheat() {
 
 function updateAttackSpeedFromMomentum() {
     const speedBonus = momentumStacks * momentumIntervalReduction;
-    intervalDuration = Math.max(100, baseInterval - speedBonus);
+    intervalDuration = Math.max(100, getBaseSpeedFromUpgrades() - (momentumStacks * momentumIntervalReduction));
     startGameInterval();
     updateAttackSpeedDisplay();
 }
@@ -266,17 +266,17 @@ function updateAttackSpeedDisplay() {
 function speedUpGame() {
     var speedCost = Math.floor(1000000 * Math.pow(1.3, speedUpgrades));
     if (energy >= speedCost && speedUpgrades < 6) {
-        intervalDuration = Math.max(100, intervalDuration - 200);
+        speedUpgrades++;
+        intervalDuration = getBaseSpeedFromUpgrades();  // ✅ use consistent logic
+
         startGameInterval();
         updateAttackSpeedDisplay();
-        speedUpgrades++;
         energy -= speedCost;
         updateEnergyText();
         animateEnergyPop(); // animation only on user action
         document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
 
         if (speedUpgrades >= 6) {
-            // Hide the cost and button container at max upgrades
             document.getElementById('speedCostContainer').style.display = 'none';
         }
     } else if (speedUpgrades >= 6) {
@@ -287,6 +287,8 @@ function speedUpGame() {
     var nextCost = Math.floor(1000000 * Math.pow(1.1, speedUpgrades));
     document.getElementById('speedCost').innerHTML = formatNumber(nextCost);
 }
+
+
 
 
 function buyFlurry() {
@@ -432,6 +434,10 @@ function formatNumber(n) {
     } else {
         return Math.round(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
+}
+
+function getBaseSpeedFromUpgrades() {
+    return Math.max(100, baseInterval - speedUpgrades * 200);
 }
 
 
