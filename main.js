@@ -264,7 +264,7 @@ function updateAttackSpeedDisplay() {
 }
 
 function speedUpGame() {
-    var speedCost = Math.floor(1000000 * Math.pow(1.3, speedUpgrades));
+    var speedCost = Math.floor(1000000 * Math.pow(1.5, speedUpgrades));
     if (energy >= speedCost && speedUpgrades < 6) {
         speedUpgrades++;
         intervalDuration = getBaseSpeedFromUpgrades();  // ✅ use consistent logic
@@ -284,7 +284,7 @@ function speedUpGame() {
         document.getElementById('speedCostContainer').style.display = 'none';
     }
 
-    var nextCost = Math.floor(1000000 * Math.pow(1.1, speedUpgrades));
+    var nextCost = Math.floor(1000000 * Math.pow(1.5, speedUpgrades));
     document.getElementById('speedCost').innerHTML = formatNumber(nextCost);
 }
 
@@ -502,14 +502,14 @@ function loadGame() {
 
         document.getElementById('sharpness').innerHTML = formatNumber(sharpnessUpgrade);
         document.getElementById('swordCost').innerHTML = formatNumber(Math.floor(10 * Math.pow(1.1, swords)));
-        document.getElementById('speedCost').innerHTML = formatNumber(Math.floor(1000000 * Math.pow(1.1, speedUpgrades)));
+        document.getElementById('speedCost').innerHTML = formatNumber(Math.floor(1000000 * Math.pow(1.5, speedUpgrades)));
         document.getElementById('flurryCost').innerHTML = formatNumber(Math.floor(2500 * Math.pow(1.25, flurryUpgrades)));
         document.getElementById('sharpenCost').innerHTML = formatNumber(Math.floor(1500 * Math.pow(1.25, sharpnessUpgrade-1)));
 		updateUpgradeButtonsVisibility();
 
         startGameInterval();
         updateAttackSpeedDisplay();
-		if (speedUpgrades >= 6 || intervalDuration <= 100) {
+		if (speedUpgrades >= 6) {
 			document.getElementById('speedCostContainer').style.display = 'none';
 		}
 		if (flurryHitchance >= 0.5) {
