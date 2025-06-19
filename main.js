@@ -40,11 +40,6 @@ const skillDependencies = {
 };
 
 
-function prettify(input){
-    var output = Math.round(input * 1000000)/1000000;
-	return output;
-}
-
 //Makes a skill unlockable
 function canUnlock(skillId) {
   const prereqs = skillDependencies[skillId] || [];
@@ -253,14 +248,21 @@ function flurrySlash() {
         console.log("Flurry Slash triggered!");
     }
 }
-
-// Update Attack Speed display
 function updateAttackSpeedDisplay() {
-    let seconds = (intervalDuration / 1000).toFixed(2);
-    document.getElementById("attackSpeed").innerHTML = seconds;
+    // Calculate attacks per second from intervalDuration (ms)
+    const attacksPerSecond = 1000 / intervalDuration;
+    
+    // Find the attack speed span element
+    const attackSpeedElem = document.getElementById('attackSpeed');
+    
+    if (attackSpeedElem) {
+        // Format to 2 decimal places, e.g. 1.25 sec or attacks/sec depending on preference
+        // Your HTML shows "Attack Speed: <span id='attackSpeed'>1.00</span> sec"
+        // So show intervalDuration in seconds rounded to 2 decimals:
+        attackSpeedElem.innerText = (intervalDuration / 1000).toFixed(2);
+    }
 }
 
-// Increase game speed
 function speedUpGame() {
     var speedCost = Math.floor(1000000 * Math.pow(1.3, speedUpgrades));
     if (energy >= speedCost && speedUpgrades < 6) {
@@ -271,12 +273,51 @@ function speedUpGame() {
         energy -= speedCost;
         updateEnergyText();
         animateEnergyPop(); // animation only on user action
-		document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
+        document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
 
+        if (speedUpgrades >= 6) {
+            // Hide the cost and button container at max upgrades
+            document.getElementById('speedCostContainer').style.display = 'none';
+        }
+    } else if (speedUpgrades >= 6) {
+        alert("Attack Speed is capped at 0.5!");
+        document.getElementById('speedCostContainer').style.display = 'none';
     }
+
     var nextCost = Math.floor(1000000 * Math.pow(1.1, speedUpgrades));
     document.getElementById('speedCost').innerHTML = formatNumber(nextCost);
 }
+
+
+function buyFlurry() {
+    var flurryCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
+
+    if (energy >= flurryCost && flurryHitchance < 0.5) {
+        flurryHitchance = Math.min(0.5, flurryHitchance + 0.1);  // Max out at 50%
+        flurryUpgrades++;
+        energy -= flurryCost;
+
+        document.getElementById('flurryChance').innerHTML = (flurryHitchance * 100).toFixed(1) + '%';
+
+        updateEnergyText();
+        animateEnergyPop();
+
+        var nextCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
+        document.getElementById('flurryCost').innerHTML = formatNumber(nextCost);
+
+        // Hide entire container when maxed
+        if (flurryHitchance >= 0.5) {
+			document.getElementById('flurryCostContainer').style.display = "none";
+		}
+
+    } else if (flurryHitchance >= 0.5) {
+        alert("Flurry chance is capped at 50%!");
+        document.getElementById('flurryCostContainer').style.display = "none";
+    }
+}
+
+
+
 
 // Calculate energy per second
 function updateEnergyPerSecond() {
@@ -366,19 +407,9 @@ function buySword() {
     var nextCost = Math.floor(10 * Math.pow(1.1, swords));
     document.getElementById('swordCost').innerHTML = formatNumber(nextCost);
 }
-//Buy Flurry Chance
-function buyFlurry() {
-    var flurryCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
-    if (energy >= flurryCost) {
-        flurryHitchance = flurryHitchance + 0.1;
-		flurryUpgrades++;
-        energy -= flurryCost;
-        document.getElementById('flurryChance').innerHTML = prettify(flurryHitchance) * 100;
-   
-    }
-    var nextCost = Math.floor(2500 * Math.pow(1.25, flurryUpgrades));
-    document.getElementById('flurryCost').innerHTML = formatNumber(nextCost);
-}
+
+
+
 
 //Buy sharpness
 
@@ -396,16 +427,13 @@ function sharpen() {
 
 // Convert numbers > 1 M or < 0.001 to scientific and rounds them
 function formatNumber(n) {
-    // Round the number to the nearest whole number
-    const rounded = Math.round(n);
-
-    // Use exponential notation if it's extremely large or small
-    if (Math.abs(rounded) >= 1e6 || (Math.abs(rounded) > 0 && Math.abs(rounded) < 0.001)) {
-        return rounded.toExponential(2); // Scientific notation with 2 decimal places
+    if (Math.abs(n) >= 1e6 || (Math.abs(n) > 0 && Math.abs(n) < 0.001)) {
+        return n.toExponential(2);
     } else {
-        return rounded.toLocaleString(undefined, { maximumFractionDigits: 0 }); // Normal formatting, no decimals
+        return Math.round(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
 }
+
 
 // Hides unused tabs and displays current tab
 function openTab(tabId) {
@@ -464,7 +492,8 @@ function loadGame() {
 		updateSkillPointsDisplay();
         document.getElementById('swords').innerHTML = formatNumber(swords);
         document.getElementById('speedUpgradeCount').innerText = speedUpgrades;
-        document.getElementById('flurryChance').innerHTML = prettify(flurryHitchance) * 100;
+        document.getElementById('flurryChance').innerHTML = (flurryHitchance * 100).toFixed(1) + '%';
+
         document.getElementById('sharpness').innerHTML = formatNumber(sharpnessUpgrade);
         document.getElementById('swordCost').innerHTML = formatNumber(Math.floor(10 * Math.pow(1.1, swords)));
         document.getElementById('speedCost').innerHTML = formatNumber(Math.floor(1000000 * Math.pow(1.1, speedUpgrades)));
@@ -474,6 +503,13 @@ function loadGame() {
 
         startGameInterval();
         updateAttackSpeedDisplay();
+		if (speedUpgrades >= 6 || intervalDuration <= 100) {
+			document.getElementById('speedCostContainer').style.display = 'none';
+		}
+		if (flurryHitchance >= 0.5) {
+			document.getElementById('flurryCostContainer').style.display = "none";
+		}
+
 
         console.log("Game loaded!");
     }
